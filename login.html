@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登录</title>
+<link href="./css/bootstrap.min.css" rel="stylesheet" />
+
+<script src="./js/jquery.min.js" type="text/javascript"></script>
+<script src="./js/bootstrap.min.js" type="text/javascript"></script>
+<style>
+.capslock{
+    padding:0 2px 2px 26px;
+    position:absolute;
+    margin: 0 0 0 60px;
+    width:130px;
+    height:30px;
+    line-height:30px;
+    display:none;
+    overflow:hidden;
+    z-index:4;
+    color:#124fed;
+    background: url(imgs/capslock.png) no-repeat;
+}
+</style>
+<script>
+$(document).ready(function(){
+    $("#logininput").on('click.login',function(){
+        login();
+    });
+    
+    //密码大写输入提示
+    function capitalTip(id){
+        $('#' + id).after('<div class="capslock" id="capital_password"><span>大写锁定已开启</span></div>');
+        var capital = false; //聚焦初始化，防止刚聚焦时点击Caps按键提示信息显隐错误
+        
+        // 获取大写提示的标签，并提供大写提示显示隐藏的调用接口
+        var capitalTip = {
+            $elem: $('#capital_'+id),
+            toggle: function (s) {
+                if(s === 'none'){
+                    this.$elem.hide();
+                }else if(s === 'block'){
+                    this.$elem.show();
+                }else if(this.$elem.is(':hidden')){
+                    this.$elem.show();
+                }else{
+                    this.$elem.hide();
+                   }
+            }
+        }
+        $('#' + id).on('keydown.caps',function(e){
+            if (e.keyCode === 20 && capital) { // 点击Caps大写提示显隐切换
+                capitalTip.toggle();
+            }
+        }).on('focus.caps',function(){capital = false}).on('keypress.caps',function(e){capsLock(e)}).on('blur.caps',function(e){
+            
+            //输入框失去焦点，提示隐藏
+            capitalTip.toggle('none');
+        });
+        function capsLock(e){
+            var keyCode = e.keyCode || e.which;// 按键的keyCode
+            var isShift = e.shiftKey || keyCode === 16 || false;// shift键是否按住
+            if(keyCode === 9){
+                capitalTip.toggle('none');
+            }else{
+              //指定位置的字符的 Unicode 编码 , 通过与shift键对于的keycode，就可以判断capslock是否开启了
+              // 90 Caps Lock 打开，且没有按住shift键
+              if (((keyCode >= 65 && keyCode <= 90) && !isShift) || ((keyCode >= 97 && keyCode <= 122) && isShift)) {
+                  // 122 Caps Lock打开，且按住shift键
+                  capitalTip.toggle('block'); // 大写开启时弹出提示框
+                  capital = true;
+              } else {
+                  capital = true;
+              }
+            }
+        }
+    };
+    
+    //调用提示
+    capitalTip('password');
+   
+})
+</script>
+</head>
+<body>
+    <div class="container">
+        <div class="rows">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <form id="loginForm" class="form-signin form-horizontal" role="form" method="get" action="" rule="rules">
+                    <div class="form-group">
+                            <input type="text" autofocus="autofocus" class="form-control" id="username" name="username" placeholder="账号" required=""/>
+                    </div>
+                    <div class="form-group">
+                            <input class="form-control" id="password" name="password" onpaste="return false" oncontextmenu="return false" oncopy="return false" oncut="return false" placeholder="密码" required="" type="password"/>
+                    </div>
+                    <div>
+                        <button id="logininput" type="button" class="btn btn-login btn-long">登录</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-4"></div>
+        </div>
+    </div>
+</body>
+</html>
